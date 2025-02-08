@@ -1,0 +1,27 @@
+form{
+  z-index: 2;
+  position: relative;
+}
+
+input:focus{
+  outline: none;
+  border:2px solid orange;
+}
+
+button{
+  padding: 5px;
+}
+
+#Add{
+  background-color: orange;
+  border-style: none;
+  margin: 5px;
+  margin-left: 0px;
+  color: white;
+  padding: 5px 30px;
+  border-radius: 20%;
+}
+
+#Tools{
+  width: 15%;
+}
