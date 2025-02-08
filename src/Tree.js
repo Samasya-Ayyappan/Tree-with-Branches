@@ -76,13 +76,21 @@ function Tree() {
     
     const handleSubmit = (e) => {
         e.preventDefault();
-
+    
         if (editMode) {
             const updateNode = (nodes) =>
                 nodes.map((node) =>
                     node.id === currentNode
-                        ? { ...node, title: formData.title, question: formData.question }
-                        : { ...node, children: updateNode(node.children) }
+                        ? { 
+                            ...node, 
+                            title: formData.title, 
+                            question: formData.question, 
+                            childrenCount: formData.childrenCount // <-- Ensure childrenCount updates
+                        }
+                        : { 
+                            ...node, 
+                            children: updateNode(node.children) 
+                        }
                 );
             setNodes((prevNodes) => updateNode(prevNodes));
         } else {
@@ -93,21 +101,28 @@ function Tree() {
                 childrenCount: formData.childrenCount, // Store max children allowed
                 children: []
             };            
-
+    
             if (currentNode === null) {
                 setNodes((prevNodes) => [...prevNodes, newNode]);
             } else {
                 const addChild = (node) =>
                     node.id === currentNode
-                        ? { ...node, children: [...node.children, newNode] }
-                        : { ...node, children: node.children.map(addChild) };
-
+                        ? { 
+                            ...node, 
+                            children: [...node.children, newNode] 
+                        }
+                        : { 
+                            ...node, 
+                            children: node.children.map(addChild) 
+                        };
+    
                 setNodes((prevNodes) => prevNodes.map(addChild));
             }
         }
         setDisplayForm(false);
     };
-
+    
+    
     const handleDelete = (id) => {
         const deleteNode = (nodes) =>
             nodes.filter((node) => node.id !== id).map((node) => ({ ...node, children: deleteNode(node.children) }));
@@ -120,7 +135,7 @@ function Tree() {
             <div key={node.id} className="node-container p-3 border rounded container">
                 <h4>{node.title}</h4>
                 <p>{node.question}</p>
-                <p>Children Count: {node.children.length}</p>
+                <p>Children: {node.childrenCount}</p> {/* Updated Line */}
                 <div className="node-actions bg-secondary rounded-pill p-2">
                     <button onClick={() => toggleForm(null, node)} className="m-1 bg-secondary border-0">
                         <VscEdit className="text-light" />
@@ -139,49 +154,57 @@ function Tree() {
                 <div className="children-container ms-4">{renderTree(node.children)}</div>
             </div>
         ));
-    const generateFlowNodes = (nodes) => {
-        let flowNodes = [];
-        let flowEdges = [];
-        let levelSpacing = 150;
-        let siblingSpacing = 200;
-        let nodePositions = {};
-        const traverse = (parentNode, parentX = 500, parentY = 50, level = 0, siblingIndex = 0, siblingCount = 1) => {
-            let nodeX = parentX + (siblingIndex * siblingSpacing);
-            let nodeY = parentY + levelSpacing;
-            if (level in nodePositions) {
-                nodeX = nodePositions[level] + siblingSpacing;
-            }
-            nodePositions[level] = nodeX;
-            const node = {
-                id: parentNode.id.toString(),
-                type: "default",
-                data: {
-                    label: (
-                        <div style={{ textAlign: "center", whiteSpace: "pre-line" }}>
-                            <strong>{parentNode.title}</strong>
-                            <br />
-                            {parentNode.question}
-                            <br />
-                            <small>{parentNode.children.length} Children</small>
-                        </div>
-                    ),
-                },
-                position: { x: nodeX, y: nodeY },
-            };
-            flowNodes.push(node);
-            parentNode.children.forEach((child, index) => {
-                traverse(child, nodeX, nodeY, level + 1, index, parentNode.children.length);
-                flowEdges.push({
-                    id: `${parentNode.id}-${child.id}`,
-                    source: parentNode.id.toString(),
-                    target: child.id.toString(),
-                    animated: true,
+    
+        const generateFlowNodes = (nodes) => {
+            let flowNodes = [];
+            let flowEdges = [];
+            let levelSpacing = 150;
+            let siblingSpacing = 200;
+            let nodePositions = {};
+        
+            const traverse = (parentNode, parentX = 500, parentY = 50, level = 0, siblingIndex = 0, siblingCount = 1) => {
+                let nodeX = parentX + (siblingIndex * siblingSpacing);
+                let nodeY = parentY + levelSpacing;
+                if (level in nodePositions) {
+                    nodeX = nodePositions[level] + siblingSpacing;
+                }
+                nodePositions[level] = nodeX;
+        
+                const node = {
+                    id: parentNode.id.toString(),
+                    type: "default",
+                    data: {
+                        label: (
+                            <div style={{ textAlign: "center", whiteSpace: "pre-line" }}>
+                                <strong>{parentNode.title}</strong>
+                                <br />
+                                {parentNode.question}
+                                <br />
+                                <small>Children: {parentNode.childrenCount}</small> {/* Updated Line */}
+                            </div>
+                        ),
+                    },
+                    position: { x: nodeX, y: nodeY },
+                };
+        
+                flowNodes.push(node);
+        
+                parentNode.children.forEach((child, index) => {
+                    traverse(child, nodeX, nodeY, level + 1, index, parentNode.children.length);
+                    flowEdges.push({
+                        id: `${parentNode.id}-${child.id}`,
+                        source: parentNode.id.toString(),
+                        target: child.id.toString(),
+                        animated: true,
+                    });
                 });
-            });
+            };
+        
+            nodes.forEach((rootNode, index) => traverse(rootNode, 500, 0, 0, index, nodes.length));
+        
+            return { flowNodes, flowEdges };
         };
-        nodes.forEach((rootNode, index) => traverse(rootNode, 500, 0, 0, index, nodes.length));
-        return { flowNodes, flowEdges };
-    };
+        
     const { flowNodes, flowEdges } = generateFlowNodes(nodes);
 
     return (
