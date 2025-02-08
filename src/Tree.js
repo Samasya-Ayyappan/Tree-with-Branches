@@ -21,7 +21,7 @@ function Tree() {
             }, 0);
         }
     }, [displayForm]);
-    
+
 
     useEffect(() => {
         const savedNodes = localStorage.getItem("treeNodes");
@@ -39,17 +39,41 @@ function Tree() {
 
     const toggleForm = (parent = null, node = null) => {
         if (node) {
+            // Edit mode
             setEditMode(true);
             setCurrentNode(node.id);
-            setFormData({ title: node.title, question: node.question, childrenCount: node.children.length });
+            setFormData({
+                title: node.title,
+                question: node.question,
+                childrenCount: node.childrenCount
+            });
         } else {
+            // Adding a new node
+            if (parent !== null) {
+                const parentNode = findNodeById(nodes, parent);
+                if (parentNode && parentNode.children.length >= parentNode.childrenCount) {
+                    alert("Cannot add more children. Maximum limit reached!");
+                    return;
+                }
+            }
+    
             setEditMode(false);
             setCurrentNode(parent);
             setFormData({ title: "", question: "", childrenCount: 0 });
         }
         setDisplayForm(true);
     };
-
+    
+    // Helper function to find a node by its ID
+    const findNodeById = (nodes, id) => {
+        for (const node of nodes) {
+            if (node.id === id) return node;
+            const found = findNodeById(node.children, id);
+            if (found) return found;
+        }
+        return null;
+    };
+    
     const handleSubmit = (e) => {
         e.preventDefault();
 
@@ -66,8 +90,9 @@ function Tree() {
                 id: Date.now(),
                 title: formData.title,
                 question: formData.question,
+                childrenCount: formData.childrenCount, // Store max children allowed
                 children: []
-            };
+            };            
 
             if (currentNode === null) {
                 setNodes((prevNodes) => [...prevNodes, newNode]);
@@ -214,6 +239,20 @@ function Tree() {
                                 required
                             />
                         </label>
+                        <label className="w-100 mt-2">
+                            # of Children
+                            <input
+                                type="number"
+                                name="childrenCount"
+                                value={formData.childrenCount}
+                                onChange={(e) => setFormData({ ...formData, childrenCount: Number(e.target.value) })}
+                                className="mt-1 w-100 border-bottom border-0"
+                                required
+                                min="0"
+                                placeholder="# of Children"
+                            />
+                        </label>
+
                         <div className="mt-5">
                             <button type="submit" className="btn btn-warning text-light me-2 rounded-pill py-2 px-4">
                                 {editMode ? "Update" : "Add"}
