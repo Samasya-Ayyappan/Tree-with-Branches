@@ -73,6 +73,15 @@ function Tree() {
         }
         return null;
     };
+
+    const updatechildcount = (oldcount, lastcount, array) => {
+        if (lastcount < array.children.length) {
+            alert("The node has the children count more the count you have mentioned.")
+            return array.children.length;
+        } else {
+            return formData.childrenCount;
+        }
+    };
     
     const handleSubmit = (e) => {
         e.preventDefault();
@@ -85,7 +94,7 @@ function Tree() {
                             ...node, 
                             title: formData.title, 
                             question: formData.question, 
-                            childrenCount: formData.childrenCount // <-- Ensure childrenCount updates
+                            childrenCount: updatechildcount(node.childrenCount, formData.childrenCount, node)                        
                         }
                         : { 
                             ...node, 
@@ -294,5 +303,3 @@ function Tree() {
 }
 
 export default Tree;
-
-
