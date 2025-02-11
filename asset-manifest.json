@@ -1,15 +1,15 @@
 {
   "files": {
     "main.css": "/Tree-with-Branches/static/css/main.74f38f48.css",
-    "main.js": "/Tree-with-Branches/static/js/main.66426c63.js",
+    "main.js": "/Tree-with-Branches/static/js/main.4d6f6220.js",
     "static/js/488.0f31d775.chunk.js": "/Tree-with-Branches/static/js/488.0f31d775.chunk.js",
     "index.html": "/Tree-with-Branches/index.html",
     "main.74f38f48.css.map": "/Tree-with-Branches/static/css/main.74f38f48.css.map",
-    "main.66426c63.js.map": "/Tree-with-Branches/static/js/main.66426c63.js.map",
+    "main.4d6f6220.js.map": "/Tree-with-Branches/static/js/main.4d6f6220.js.map",
     "488.0f31d775.chunk.js.map": "/Tree-with-Branches/static/js/488.0f31d775.chunk.js.map"
   },
   "entrypoints": [
     "static/css/main.74f38f48.css",
-    "static/js/main.66426c63.js"
+    "static/js/main.4d6f6220.js"
   ]
 }
